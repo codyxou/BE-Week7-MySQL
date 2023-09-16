@@ -18,7 +18,9 @@ public class Projects {
 	private List<String> operations = List.of(
 				"1) Add a Project",
 				"2) List Projects",
-				"3) Select a Project"
+				"3) Select a Project",
+				"4) Update Project Details",
+				"5) Delete a Project"
 			);
 	//@formatter:on
 	
@@ -53,6 +55,15 @@ public class Projects {
 				
 				case 3:
 					selectProject();
+					break;
+					
+				case 4:
+					updateProjectDetails();
+					break;
+					
+				case 5:
+					deleteProject();
+					break;
 
 				default:
 					System.out.println("\n" + selection + " is not valid. Try again");
@@ -60,10 +71,62 @@ public class Projects {
 
 				}
 			} catch (Exception e) {
-				System.out.println("\nError: " + e + " Try again.");
+				System.out.println("\nError: " + e.toString() + " Try again.");
 			}
 		}
 
+	}
+	private void deleteProject() {
+		listProjects();
+		Integer projectID = getIntInput("Enter the ID of the project to delete");
+		if(Objects.nonNull(projectID)) {
+			projectService.deleteProject(projectID);
+			System.out.println(projectID + " has been deleted.");
+			
+			if(Objects.nonNull(curProject) && ((Project) curProject).getProjectId().equals(projectID)) {
+				curProject = null;
+			
+		}
+	}
+		
+	}
+
+	//this will return the user back to the menu if they try to update a project before selecting one
+	private void updateProjectDetails() {
+		if (Objects.isNull(curProject)) {
+			System.out.println("\nPlease select a project.");
+			return;
+		}
+		//Gathering user input for each field
+		String projectName = getStringInput ("Enter the project name. Currently: " + ((Project) curProject).getProjectName());
+		BigDecimal estimatedHours = getDecimalInput ("Enter the new estimated hours. Currently: " + ((Project) curProject).getEstimatedHours());
+		BigDecimal actualHours = getDecimalInput ("Enter the new actual hours. Currently: " + ((Project) curProject).getActualHours());
+		Integer difficulty = getIntInput("Enter new difficulty. Currently: " + ((Project) curProject).getDifficulty());
+		String notes = getStringInput ("Enter new notes. Currently: " + ((Project)curProject).getNotes());
+		
+		Project project = new Project();
+		
+		project.setProjectId(((Project) curProject).getProjectId());
+		
+		project.setProjectName(Objects.isNull(projectName)
+				? ((Project) curProject).getProjectName() : projectName);
+		
+		project.setEstimatedHours(Objects.isNull(estimatedHours)
+				? ((Project) curProject).getEstimatedHours() : estimatedHours);
+		
+		project.setActualHours(Objects.isNull(actualHours)
+				? ((Project) curProject).getActualHours() : actualHours);
+		
+		project.setDifficulty(Objects.isNull(difficulty)
+				? ((Project) curProject).getDifficulty() : difficulty);
+		
+		project.setNotes(Objects.isNull(notes)
+				? ((Project) curProject).getNotes() : notes);
+		
+		projectService.modifyProjectDetails(project);
+		curProject = projectService.fetchProjectById(((Project) curProject).getProjectId());
+		
+		
 	}
 
 	private void selectProject() {
@@ -84,7 +147,7 @@ public class Projects {
 
 	private void listProjects() {
 		List<Project> projects = projectService.fetchAllProjects();
-		System.out.println("nProjects:");
+		System.out.println("\nProjects:");
 		
 		projects.forEach(project -> System.out.println("  " + project.getProjectId()
 														+ ": " + project.getProjectName()));
@@ -94,7 +157,7 @@ public class Projects {
 		String projectName = getStringInput("Enter the project name");
 		BigDecimal estimatedHours = getDecimalInput("Enter the estimated hours");
 		BigDecimal actualHours = getDecimalInput("Enter the actual hours");
-		Integer difficulty = getIntInput("Enter the project difficult (1-5");
+		Integer difficulty = getIntInput("Enter the project difficulty (1-5)");
 		String notes = getStringInput("Enter the project notes");
 
 		Project project = new Project();

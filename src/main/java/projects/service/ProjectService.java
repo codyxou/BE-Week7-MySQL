@@ -2,10 +2,10 @@ package projects.service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import projects.dao.ProjectDao;
 import projects.entity.Project;
+import projects.exception.DBException;
 
 public class ProjectService {
 	
@@ -29,5 +29,20 @@ public class ProjectService {
 				
 	}
 
+	public void modifyProjectDetails(Project project) {
+		if(!projectDao.modifyProjectDetails(project)) {
+			throw new DBException("Project with ID= " + project.getProjectId() + " does not exist.");
+		}
+	}
+
+	public void deleteProject(Integer projectID) {
+		if (!projectDao.deleteProject(projectID)) {
+			throw new DBException("Project with ID= " + projectID + " does not exist.");
+		}
+		
+	}
+		
+	}
+
 	
-}
+
